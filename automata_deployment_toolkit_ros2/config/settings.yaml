@@ -6,8 +6,8 @@
 
 #---------Initialization---------#
 init:
-  #Target Architecture
-  arch: "x86_64"
+  #Target Architecture - valid choices are "arm64" or "amd64"
+  arch: "arm64"
 
   #ROS2 Humble nodes
   gnss: True                                                                                               #Enable GNSS

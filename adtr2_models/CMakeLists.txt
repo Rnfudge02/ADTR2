@@ -11,6 +11,11 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
+#Install source code.
+install(DIRECTORY src
+  DESTINATION share/${PROJECT_NAME}/
+)
+
 #Install models.
 install(DIRECTORY models
   DESTINATION share/${PROJECT_NAME}/

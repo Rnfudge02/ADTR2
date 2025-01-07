@@ -7,9 +7,10 @@
 from ultralytics import YOLO
 import sys
 import os
+import shutil
 
-"""!@package docstring detection.launch.py
-Responsible for launching yolo_ros executable to use object detection.
+"""!@package docstring adtr2_model_exporter.py
+Responsible for converting the 
 
 Requires that the devices module be started first.
 """
@@ -33,26 +34,30 @@ def model_exporter(model_path, arch, bat = 1):
         VRAM usage. Default value is 1, this will mess with the encoding, etc.
         More work is needed to properly support batching
     """
+
     model = YOLO(model_path)
+    extra_args = ""
 
-    int8 = False
-    dev = ""
-
-    if arch == "aarch64":
-        int8 = True
-        dev = "dla:0"
+    if arch == "arm64":
+        extra_args = "--useDLACore=0 --allowGPUFallback"
 
     else:
-        int8 = False
-        dev = "0"
+        pass
 
-    model.export(format = "onnx", int8 = int8, device = dev, batch = bat)
+    model.export(format = "onnx", batch = bat)
 
-    res_1 = model_path.replace(".pt", ".onnx")
-    res_2 = model_path.replace("n", "n-" + arch).replace(".pt", ".onnx").replace("PT", "ONNX")
-    res_3 = model_path.replace("n", "n-" + arch).replace(".pt", ".engine").replace("PT", "TRT")
-    os.rename(res_1, res_2)
-    os.system("/usr/src/tensorrt/bin/trtexec --onnx=" + res_2 + " --saveEngine=" + res_3 + " --useSpinWait --threads --useCudaGraph")
+    #Path to output of above
+    res1 = model_path.replace(".pt", ".onnx")
+    os.makedirs(model_path.replace(".pt", "").replace("PT", "ONNX"), exist_ok = True)
+    os.makedirs(model_path.replace(".pt", "").replace("PT", "TRT"), exist_ok = True)
+
+    #Create path to ONNX dir and move to ONNX dir
+    res2 = res1.replace("PT", "ONNX")
+    shutil.move(res1, res2)
+
+    #Create path to engine destination, and run trtexec
+    res3 = res2.replace(".onnx", ".engine").replace("ONNX", "TRT")
+    os.system("/usr/src/tensorrt/bin/trtexec --onnx=" + res2 + " --saveEngine=" + res3 + " --useSpinWait --threads --useCudaGraph --best " + extra_args)
 
 if __name__ == "__main__":
     model_exporter(sys.argv[1], sys.argv[2])
