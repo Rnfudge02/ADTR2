@@ -138,9 +138,13 @@ namespace adtr2 {
                 system_current_msg.data = system_current_status;
                 system_launcher_msg.data = system_launcher_status;
 
-                //Publish updated messages
-                daq_stat_publisher->publish(daq_status_msg);
-                system_stat_publisher->publish(system_status_msg);
+                //Publish launching status
+                daq_launcher_publisher->publish(daq_launcher_msg);
+                system_launcher_publisher->publish(system_launcher_msg);
+
+                //Publish updated states
+                daq_current_publisher->publish(daq_current_msg);
+                system_current_publisher->publish(system_current_msg);
             }
 
             //! Internal function for publishing status of components.
@@ -197,17 +201,17 @@ namespace adtr2 {
             example_interfaces::msg::UInt8 exporter_current_msg;
             example_interfaces::msg::UInt8 exporter_launcher_msg;
 
-            example_interfaces::msg::UInt8 system_current_msg;
-            example_interfaces::msg::UInt32 system_launcher_msg;
+            example_interfaces::msg::UInt32 system_current_msg;
+            example_interfaces::msg::UInt8 system_launcher_msg;
 
             rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_current_publisher;
             rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_launcher_publisher;
 
-            rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr exporter_current_publisher;
-            rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr exporter_launcher_publisher;
+            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr exporter_current_publisher;
+            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr exporter_launcher_publisher;
             
             rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr system_current_publisher;
-            rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr system_launcher_publisher;
+            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr system_launcher_publisher;
 
             //Launching Information
             pid_t daq_process;

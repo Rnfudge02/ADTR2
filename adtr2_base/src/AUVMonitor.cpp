@@ -42,8 +42,8 @@ AUVMonitor::AUVMonitor(const rclcpp::NodeOptions & options) : Node("auv_monitor"
     daq_service = create_service<std_srvs::srv::Trigger>(package_prefix + "toggle_daq",
         std::bind(&AUVMonitor::toggle_daq, this, std::placeholders::_1, std::placeholders::_2));
 
-    exporter_service = create_service<std_srvs::srv::Trigger>(package_prefix + "start_exporter",
-        std::bind(&AUVMonitor::start_exporter, this, std::placeholders::_1, std::placeholders::_2));
+    exporter_service = create_service<std_srvs::srv::Trigger>(package_prefix + "launch_exporter",
+        std::bind(&AUVMonitor::launch_exporter, this, std::placeholders::_1, std::placeholders::_2));
 
     system_service = create_service<std_srvs::srv::Trigger>(package_prefix + "toggle_system",
         std::bind(&AUVMonitor::toggle_system, this, std::placeholders::_1, std::placeholders::_2));
@@ -161,19 +161,19 @@ void AUVMonitor::launch_exporter(const std::shared_ptr<std_srvs::srv::Trigger::R
     //Start this before launching the system
     if (!system_toggled) {
         if (!exporter_active) {
-            RCLCPP_INFO(this->get_logger(), "Launching exporter.")
+            RCLCPP_INFO(this->get_logger(), "Launching exporter.");
 
             pid_t n = fork();
 
             if (n == 0) {
-                int launch_result = execl("/bin/bash", "bash", "-c", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/${USERNAME}/ros_ws/install/setup.bash | ros2 launch adtr2_bringup exporter.launch.py", NULL)
+                int launch_result = execl("/bin/bash", "bash", "-c", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/${USERNAME}/ros_ws/install/setup.bash | ros2 launch adtr2_bringup exporter.launch.py", NULL);
         
                 if (launch_result != -1) {
                     RCLCPP_INFO(this->get_logger(), "Exporter launch script started successfully");
                 }
 
                 else {
-                    RCLCPP_ERROR(this->get_logger(), "Could not start launch script.")
+                    RCLCPP_ERROR(this->get_logger(), "Could not start launch script.");
                     response->success = false;
                     response->message = "Exporter not launched.";
                     exporter_launcher_status = 1;
@@ -202,7 +202,7 @@ void AUVMonitor::toggle_system(const std::shared_ptr<std_srvs::srv::Trigger::Req
 
         if (n == 0) {
             //Use execl to run ros2 launch on nv_vslam launch script - in child process
-            int current_launcher_result = execl("/bin/bash", "bash", "-c", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/${USERNAME}/ros_ws/install/setup.bash | ros2 launch adtr2_bringup auv.system.launch.py", NULL);
+            int launch_result = execl("/bin/bash", "bash", "-c", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/${USERNAME}/ros_ws/install/setup.bash | ros2 launch adtr2_bringup auv.system.launch.py", NULL);
 
             if (launch_result != -1) {
                 RCLCPP_INFO(this->get_logger(), "System launch script started successfully");

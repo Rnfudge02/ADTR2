@@ -47,16 +47,19 @@ def model_exporter(model_path, arch, bat = 1):
     model.export(format = "onnx", batch = bat)
 
     #Path to output of above
-    res1 = model_path.replace(".pt", ".onnx")
-    os.makedirs(model_path.replace(".pt", "").replace("PT", "ONNX"), exist_ok = True)
+    os.makedirs(model_path.replace(model_path.split("/", -1)[-1], "").replace("PT", "ONNX"), exist_ok = True)
     os.makedirs(model_path.replace(".pt", "").replace("PT", "TRT"), exist_ok = True)
 
+    res1 = model_path.replace(".pt", ".onnx")
     #Create path to ONNX dir and move to ONNX dir
     res2 = res1.replace("PT", "ONNX")
-    shutil.move(res1, res2)
-
     #Create path to engine destination, and run trtexec
     res3 = res2.replace(".onnx", ".engine").replace("ONNX", "TRT")
+    #shutil.move(res1, res2)
+
+    print(res1)
+    print(res2)
+    print(res3)
     os.system("/usr/src/tensorrt/bin/trtexec --onnx=" + res2 + " --saveEngine=" + res3 + " --useSpinWait --threads --useCudaGraph --best " + extra_args)
 
 if __name__ == "__main__":
