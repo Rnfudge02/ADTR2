@@ -10,17 +10,17 @@ init:
   arch: "arm64"
 
   #ROS2 Humble nodes
-  gnss: True                                                                                               #Enable GNSS
+  gnss: False                                                                                               #Enable GNSS
   zed: True                                                                                                 #Enable ZED Camera
-  ohy5III: False                                                                                            #Enable OHY5III
+  qhy5III: False                                                                                            #Enable qhy5III
   fcc: False                                                                                                #Enable Flight Control Computer
-  calib: False                                                                                              #Enable Camera calibration module (For OHY or other USB webcam)
+  calib: False                                                                                              #Enable Camera calibration module (For qhy or other USB webcam)
   foxglove: True                                                                                            #Enable Foxglove Bridge
   static_tf: False                                                                                          #Enable Static Transform
 
   #ISAAC ROS GEM's
   vslam: False                                                                                               #Enable Visual SLAM
-  od: True                                                                                                 #Enable Object Detection
+  od: False                                                                                                 #Enable Object Detection
   sr: False                                                                                                 #Enable Nvblox Scene Reconstruction
 
   #System modules
@@ -45,9 +45,9 @@ config:
     f_x: 527.886474609375                                                                                   #Approximate focal parameter (x-dir, should be same for most ZED cameras)
     f_y: 527.886474609375                                                                                   #Approximate focal parameter (y-dir, should be same for most ZED cameras)
 
-  #OHY5III configuration parameters
-  ohy5III:
-    camera_settings: "/home/auv-deployment/ros_ws/src/auv_deployment_tools_ros2/config/ohy_params.yaml"       #Directory specifying configuration parameters
+  #qhy5III configuration parameters
+  qhy5III:
+    camera_settings: "/home/auv-deployment/ros_ws/src/auv_deployment_tools_ros2/config/qhy_params.yaml"       #Directory specifying configuration parameters
     camera_info: ""                                                                                           #File containing calibration settings
 
   #Flight control computer configuration parameters
@@ -88,7 +88,7 @@ storage:
     topics:
       - "/fix"
 
-  ohy5III:
+  qhy5III:
     enabled: False
     topics:
       -

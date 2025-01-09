@@ -16,7 +16,7 @@ import yaml
 Responsible for recording selected topics.
 
 Currently supports GNSS Reciever, ZED2i,
-and OHY5-III nodes. Requires devices to be started.
+and qhy5-III nodes. Requires devices to be started.
 """
 
 def generate_launch_description():
@@ -39,8 +39,8 @@ def generate_launch_description():
         if (config_arr['init']['gnss'] == True and config_arr['storage']['gnss']['enabled'] == True):
             topics.extend(config_arr['storage']['gnss']['topics'])
 
-        if (config_arr['init']['ohy5III'] == True and config_arr['storage']['ohy5III']['enabled'] == True):
-            topics.extend(config_arr['storage']['ohy5III']['topics'])
+        if (config_arr['init']['qhy5III'] == True and config_arr['storage']['qhy5III']['enabled'] == True):
+            topics.extend(config_arr['storage']['qhy5III']['topics'])
 
         if (config_arr['init']['zed'] == True and config_arr['storage']['zed']['enabled'] == True):
             topics.extend(config_arr['storage']['zed']['topics'])

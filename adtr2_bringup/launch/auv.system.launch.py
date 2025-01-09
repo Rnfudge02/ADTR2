@@ -26,7 +26,7 @@ def generate_launch_description():
     config_file = os.path.join(get_package_share_directory("automata_deployment_toolkit_ros2"), "config", "settings.yaml")
     
     gnss_config_file = os.path.join(get_package_share_directory("automata_deployment_toolkit_ros2"), "config", "nmea_serial_driver.yaml")
-    usb_cam_config_file = os.path.join(get_package_share_directory("automata_deployment_toolkit_ros2"), "config", "ohy_params.yaml")
+    usb_cam_config_file = os.path.join(get_package_share_directory("automata_deployment_toolkit_ros2"), "config", "qhy_params.yaml")
 
     #ZED configuration files stored by package
     common_config = os.path.join(get_package_share_directory("automata_deployment_toolkit_ros2"), "config", "zed", "common.yaml")
@@ -161,10 +161,10 @@ def generate_launch_description():
 
             num_cam = 0
 
-            if (config_arr['init']['ohy5III'] == True):
+            if (config_arr['init']['qhy5III'] == True):
                 needs_denoising = True
 
-                base_frame = "ohy"
+                base_frame = "qhy"
                 
                 fuse_imu = False
 
@@ -330,16 +330,16 @@ def generate_launch_description():
             
             exec_nodes.append(gnss_node)
 
-        #If ohy5III is true, add config to a Node
-        if config_arr['init']['ohy5III'] == True:
-            ohy5III_node = ComposableNode(
+        #If qhy5III is true, add config to a Node
+        if config_arr['init']['qhy5III'] == True:
+            qhy5III_node = ComposableNode(
                 package = "usb_cam",
                 plugin = "usb_cam_node_exe",
-                namespace = "/ohy5III",
+                namespace = "/qhy5III",
                 parameters = [usb_cam_config_file]
             )
             
-            accel_nodes.append(ohy5III_node)
+            accel_nodes.append(qhy5III_node)
 
         nv_accel_container = ComposableNodeContainer(
             package = "rclcpp_components",

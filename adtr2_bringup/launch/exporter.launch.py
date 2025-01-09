@@ -16,7 +16,7 @@ import yaml
 Responsible for recording selected topics.
 
 Currently supports GNSS Reciever, ZED2i,
-and OHY5-III nodes. Requires devices to be started.
+and qhy5-III nodes. Requires devices to be started.
 """
 
 def generate_launch_description():

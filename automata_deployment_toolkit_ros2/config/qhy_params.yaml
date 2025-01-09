@@ -3,12 +3,12 @@
 video_device: "/dev/bus/usb/006/004:"
       framerate: 15.0
       io_method: "mmap"
-      frame_id: "ohy5III"
+      frame_id: "qhy5III"
       pixel_format: "mjpeg2rgb"
       av_device_format: "YUV422P"
       image_width: 640
       image_height: 480
-      camera_name: "OHY5III Node"
+      camera_name: "QHY5III Node"
       camera_info_url: ""
       brightness: -1
       contrast: -1

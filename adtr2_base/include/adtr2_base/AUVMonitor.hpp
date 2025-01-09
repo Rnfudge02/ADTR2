@@ -76,6 +76,28 @@ namespace adtr2 {
             */
             void toggle_daq(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response);
 
+            //! Enables launching CNN exporter
+            /*!
+                Starts exporting process by launching exporter.launch.py. Will choose appropriate architecture and settings,
+                and export optimized onnx plans and TensorRT engines.
+
+                @pre System cannot be started
+
+                Precondition -> Postcondition:
+
+                !exporter -> exporter
+
+                success -> !exporter
+
+                If an internal error prevents the postconditions from following the preconditions, the response will indicate failure
+                and the message should inform of the reason for failure.
+
+                @param request Not used, part of formatting a std_srvs::Trigger callback.
+                @param response Informs caller of status of the request.
+                @return void
+            */
+            void launch_exporter(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response);
+
             //! Enables toggling system components
             /*!
                 Starts system parameters by calling system.launch.py, which determines it's behavior
@@ -106,14 +128,15 @@ namespace adtr2 {
                 @return void
             */
             void __status_publishing_callback() {
-                uint32_t temp_sys_msg = 0;
-
                 //Update data of messages
-                daq_status_msg.data = daq_status;
+                daq_current_msg.data = daq_current_status;
+                daq_launcher_msg.data = daq_launcher_status;
 
-                temp_sys_msg = system_launcher_status | (zed_status << 8) | (vslam_status << 16) | (od_status << 24);
+                exporter_current_msg.data = exporter_current_status;
+                exporter_launcher_msg.data = exporter_launcher_status;
                 
-                system_status_msg.data = temp_sys_msg;
+                system_current_msg.data = system_current_status;
+                system_launcher_msg.data = system_launcher_status;
 
                 //Publish updated messages
                 daq_stat_publisher->publish(daq_status_msg);
@@ -127,7 +150,20 @@ namespace adtr2 {
                 @return void.
             !*/
             void __node_checking_callback() {
-                return;
+                if (system_toggled) {
+                    //Check ZED2i status
+
+                    //Check VSLAM status
+
+                    //Check OD status
+
+                    if (daq_toggled) {
+                        
+                    }
+
+                    //Retrieve component statuses and bitmask into uint32
+                    system_current_status = 0b0 | (zed_status << 8) | (vslam_status << 16) | (od_status << 24);
+                }
             }
 
             //Timer members
@@ -136,30 +172,52 @@ namespace adtr2 {
 
             //Service members
             rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr daq_service;
+            rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr exporter_service;
             rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr system_service;
 
-            //Component statuses
-            uint8_t daq_status;
+            //Service statuses
+            uint8_t daq_launcher_status;
+            uint8_t daq_current_status;
+
+            uint8_t exporter_launcher_status;
+            uint8_t exporter_current_status;
 
             uint8_t system_launcher_status;
+            uint32_t system_current_status;
+
+            //Component statuses
             uint8_t zed_status;
             uint8_t vslam_status;
             uint8_t od_status;
-            uint32_t system_status;
 
-            //Messages for publishing status
-            example_interfaces::msg::UInt8 daq_status_msg;
-            example_interfaces::msg::UInt32 system_status_msg;
+            //Messages for publishing statuses
+            example_interfaces::msg::UInt8 daq_current_msg;
+            example_interfaces::msg::UInt8 daq_launcher_msg;
 
-            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_stat_publisher;
-            rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr system_stat_publisher;
+            example_interfaces::msg::UInt8 exporter_current_msg;
+            example_interfaces::msg::UInt8 exporter_launcher_msg;
+
+            example_interfaces::msg::UInt8 system_current_msg;
+            example_interfaces::msg::UInt32 system_launcher_msg;
+
+            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_current_publisher;
+            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_launcher_publisher;
+
+            rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr exporter_current_publisher;
+            rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr exporter_launcher_publisher;
+            
+            rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr system_current_publisher;
+            rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr system_launcher_publisher;
 
             //Launching Information
             pid_t daq_process;
+            pid_t exporter_process;
             pid_t system_process;
 
-            bool daq_on;
-            bool system_on;
+            //Actor interaction statuses
+            bool daq_toggled;
+            bool exporter_active;
+            bool system_toggled;
 
             //Count (assuming ensures only one instance can be created?)
             size_t count_;
