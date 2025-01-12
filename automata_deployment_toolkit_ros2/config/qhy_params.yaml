@@ -1,6 +1,6 @@
 /**:
     ros__parameters:
-video_device: "/dev/bus/usb/006/004:"
+      video_device: "/dev/bus/usb/006/004:"
       framerate: 15.0
       io_method: "mmap"
       frame_id: "qhy5III"

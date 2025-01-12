@@ -161,6 +161,7 @@ namespace adtr2 {
 
                     //Check OD status
 
+                    //Check Data acquisition PID
                     if (daq_toggled) {
                         
                     }

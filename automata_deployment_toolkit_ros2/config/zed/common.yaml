@@ -114,7 +114,7 @@
         sensors:
             publish_imu_tf: true # [usually overwritten by launch file] enable/disable the IMU TF broadcasting
             sensors_image_sync: true # Synchronize Sensors messages with latest published video/depth message
-            sensors_pub_rate: 400. # frequency of publishing of sensors data. MAX: 400. - MIN: grab rate
+            sensors_pub_rate: 60. # frequency of publishing of sensors data. MAX: 400. - MIN: grab rate
 
         object_detection:
             od_enabled: false # True to enable Object Detection

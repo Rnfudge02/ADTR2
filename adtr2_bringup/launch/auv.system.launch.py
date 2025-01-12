@@ -230,8 +230,8 @@ def generate_launch_description():
             accel_nodes.append(visual_slam_node)
 
         if (config_arr['init']['od'] == True):
-            model_file = os.path.join(get_package_share_directory("adtr2_models"), "models", "ONNX", "yolo11n-x86_64.onnx")
-            engine_file = os.path.join(get_package_share_directory("adtr2_models"), "models", "TRT", "yolo11n-x86_64.engine")
+            model_file = os.path.join("/home/auv-deployment/ros_ws/src/adtr2/adtr2_models", "models", "ONNX", "yolov8s-" + config_arr['init']['arch'] + ".onnx")
+            engine_file = os.path.join("/home/auv-deployment/ros_ws/src/adtr2/adtr2_models", "models", "TRT", "yolov8s-" + config_arr['init']['arch'] + ".engine")
 
             #Encoder node should default output nitros_list_nchw_rgb_f32
             encoder_node = ComposableNode(
@@ -277,8 +277,8 @@ def generate_launch_description():
                 package="isaac_ros_yolov8",
                 plugin="nvidia::isaac_ros::yolov8::YoloV8DecoderNode",
                 parameters=[{
-                    "confidence_threshold": 0.75,
-                    "nms_threshold": 0.9,
+                    "confidence_threshold": 0.40,
+                    "nms_threshold": 0.45,
                 }]
             )
 
