@@ -11,23 +11,18 @@ Automata Deployment Tools ROS2 is a ros2 package used to develop and deploy edge
 6. Compile the project with the following command.
 
 ```bash
-source /opt/ros/${ROS_DISTRO}/setup.bash && colcon build --parallel-workers $(nproc) \
-    --symlink-install --event-handlers console_direct+ --base-paths src --cmake-args \
-    ' -DCMAKE_BUILD_TYPE=Debug' ' -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs' \
-    ' -DCMAKE_CXX_FLAGS=-Wall -Wextra -Wno-unused-parameter' ' --no-warn-unused-cli' \
-    --packages-select automata_deployment_tools_ros2 && source install/setup.bash
+/home/auv-deployment/ros_ws/DC.sh
 ```
 
 ## Usage
-If you want to visualize data collection and control the device via GUI, install
-Foxglove Studio using the following command.
+If you want to visualize data collection and control the device via GUI, install Foxglove Studio using the following command.
 
 ```bash
-sudo snap install foxglove-studio #x86_64 only
+sudo snap install foxglove-studio #x86_64 only, arm64 requires install with dpkg
 ```
 
 ### AUVMonitor
-Run the following command to start the AUV Monitor, the main entrypoint for the program
+Run the following command to start the AUV Monitor, the main entrypoint for the program. Running the DC.sh script mentioned above will launch the monitor
 
 ```bash
 source /opt/ros/${ROS_DISTRO}/setup.bash && source install/setup.bash && \
@@ -52,6 +47,8 @@ Documentation for code can be generated using the included Doxyfile with [Doxyge
 To generate documentation for configuration options, the [yamldoc](http://chrisbcole.me/yamldoc/) pip package should be used
 
 ## Contributing
+This is an open source project maintained by Robert Fudge, 2025 -
+
 To ensure Doxygen output is complete and precise, please follow Doxygen comment styling to ensure generated output contains all documentation
 
 For specific styling preferences, refer to AUVMonitor.hpp for an example

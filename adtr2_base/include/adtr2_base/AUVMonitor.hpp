@@ -21,19 +21,17 @@
 #include "example_interfaces/msg/u_int32.hpp"
 #include "std_srvs/srv/trigger.hpp"
 
+#include "adtr2_base/ADTR2Module.hpp"
+
 namespace adtr2 {
     namespace monitor {
-        //Class constants
-        const std::string package_prefix = "/auv_monitor/";
-        const int max_messages = 10;
-
         //! AUVMonitor - Controls launching other components, and monitoring their status
         /*!
             Responsible for launching and monitoring ROS2 nodes. This is accomplished with ROS2 services,
             which allow the user/developer to toggle components, and publishers to alert users/other components
             to the status of all components.
         !*/
-        class AUVMonitor : public rclcpp::Node {
+        class AUVMonitor : public adtr2::ADTR2Module {
         public:
             //! Creates an AUVMonitor Node.
             /*!
@@ -42,7 +40,7 @@ namespace adtr2 {
                 @param node_check_int Interval at which to check node topics. TEMP DISABLED
                 @return Instance of AUVMonitor.
             !*/
-            AUVMonitor(const rclcpp::NodeOptions & options);
+            AUVMonitor(const rclcpp::NodeOptions& options);
 
             //! Runs on AUVMonitor node death.
             /*!
@@ -75,28 +73,6 @@ namespace adtr2 {
                 @return void
             */
             void toggle_daq(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response);
-
-            //! Enables launching CNN exporter
-            /*!
-                Starts exporting process by launching exporter.launch.py. Will choose appropriate architecture and settings,
-                and export optimized onnx plans and TensorRT engines.
-
-                @pre System cannot be started
-
-                Precondition -> Postcondition:
-
-                !exporter -> exporter
-
-                success -> !exporter
-
-                If an internal error prevents the postconditions from following the preconditions, the response will indicate failure
-                and the message should inform of the reason for failure.
-
-                @param request Not used, part of formatting a std_srvs::Trigger callback.
-                @param response Informs caller of status of the request.
-                @return void
-            */
-            void launch_exporter(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response);
 
             //! Enables toggling system components
             /*!
@@ -131,9 +107,6 @@ namespace adtr2 {
                 //Update data of messages
                 daq_current_msg.data = daq_current_status;
                 daq_launcher_msg.data = daq_launcher_status;
-
-                exporter_current_msg.data = exporter_current_status;
-                exporter_launcher_msg.data = exporter_launcher_status;
                 
                 system_current_msg.data = system_current_status;
                 system_launcher_msg.data = system_launcher_status;
@@ -184,9 +157,6 @@ namespace adtr2 {
             uint8_t daq_launcher_status;
             uint8_t daq_current_status;
 
-            uint8_t exporter_launcher_status;
-            uint8_t exporter_current_status;
-
             uint8_t system_launcher_status;
             uint32_t system_current_status;
 
@@ -199,29 +169,21 @@ namespace adtr2 {
             example_interfaces::msg::UInt8 daq_current_msg;
             example_interfaces::msg::UInt8 daq_launcher_msg;
 
-            example_interfaces::msg::UInt8 exporter_current_msg;
-            example_interfaces::msg::UInt8 exporter_launcher_msg;
-
             example_interfaces::msg::UInt32 system_current_msg;
             example_interfaces::msg::UInt8 system_launcher_msg;
 
             rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_current_publisher;
             rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_launcher_publisher;
-
-            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr exporter_current_publisher;
-            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr exporter_launcher_publisher;
             
             rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr system_current_publisher;
             rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr system_launcher_publisher;
 
             //Launching Information
             pid_t daq_process;
-            pid_t exporter_process;
             pid_t system_process;
 
             //Actor interaction statuses
             bool daq_toggled;
-            bool exporter_active;
             bool system_toggled;
 
             //Count (assuming ensures only one instance can be created?)

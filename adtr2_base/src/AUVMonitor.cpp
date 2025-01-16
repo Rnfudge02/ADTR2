@@ -11,24 +11,21 @@
 
 #include "adtr2_base/AUVMonitor.hpp"
 
-using namespace std::chrono_literals;
 using namespace adtr2::monitor;
 
-AUVMonitor::AUVMonitor(const rclcpp::NodeOptions & options) : Node("auv_monitor", options), count_(0) {
+AUVMonitor::AUVMonitor(const rclcpp::NodeOptions & options) : ADTR2Module("auv_monitor", options), count_(0) {
+    std::chrono::duration t_stat = this->reg_and_ret_ms("t_stat", "1000", "Period the AUVMonitor should monitor the system and publish it's status.");
+
     //Set up timer for publishing statuses and timer for checking if nodes are active
-    status_publishing_timer = this->create_wall_timer(250ms, std::bind(&AUVMonitor::__status_publishing_callback, this));
-    node_checking_timer = this->create_wall_timer(250ms, std::bind(&AUVMonitor::__node_checking_callback, this));
+    status_publishing_timer = this->create_wall_timer(t_stat, std::bind(&AUVMonitor::__status_publishing_callback, this));
 
     //Initialize process ids to 0
     daq_process = 0;
-    exporter_process = 0;
     system_process = 0;
 
+    //Initialize statuses to 0
     daq_current_status = 0;
     daq_launcher_status = 0;
-
-    exporter_current_status = 0;
-    exporter_launcher_status = 0;
 
     system_current_status = 0;
     system_launcher_status = 0;
@@ -39,32 +36,22 @@ AUVMonitor::AUVMonitor(const rclcpp::NodeOptions & options) : Node("auv_monitor"
     od_status = 0;
 
     //Create services for toggling components
-    daq_service = create_service<std_srvs::srv::Trigger>(package_prefix + "toggle_daq",
+    daq_service = create_service<std_srvs::srv::Trigger>(module_prefix + "toggle_daq",
         std::bind(&AUVMonitor::toggle_daq, this, std::placeholders::_1, std::placeholders::_2));
 
-    exporter_service = create_service<std_srvs::srv::Trigger>(package_prefix + "launch_exporter",
-        std::bind(&AUVMonitor::launch_exporter, this, std::placeholders::_1, std::placeholders::_2));
-
-    system_service = create_service<std_srvs::srv::Trigger>(package_prefix + "toggle_system",
+    system_service = create_service<std_srvs::srv::Trigger>(module_prefix + "toggle_system",
         std::bind(&AUVMonitor::toggle_system, this, std::placeholders::_1, std::placeholders::_2));
 
     //Create publishers for component statuses
-    daq_current_publisher = create_publisher<example_interfaces::msg::UInt8>(package_prefix + "status/daq_current", max_messages);
-    daq_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(package_prefix + "status/daq_launcher", max_messages);
+    daq_current_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "status/daq_current", max_messages);
+    daq_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "status/daq_launcher", max_messages);
 
-    exporter_current_publisher = create_publisher<example_interfaces::msg::UInt8>(package_prefix + "status/exporter_current", max_messages);
-    exporter_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(package_prefix + "status/exporter_launcher", max_messages);
-
-    system_current_publisher = create_publisher<example_interfaces::msg::UInt32>(package_prefix + "status/system_current", max_messages);
-    system_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(package_prefix + "status/system_launcher", max_messages);
+    system_current_publisher = create_publisher<example_interfaces::msg::UInt32>(module_prefix + "status/system_current", max_messages);
+    system_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "status/system_launcher", max_messages);
     
-
     //Create uint8_t messages for publishing status
     daq_current_msg = example_interfaces::msg::UInt8();
     daq_launcher_msg = example_interfaces::msg::UInt8();
-
-    exporter_current_msg = example_interfaces::msg::UInt8();
-    exporter_launcher_msg = example_interfaces::msg::UInt8();
 
     system_current_msg = example_interfaces::msg::UInt32();
     system_launcher_msg = example_interfaces::msg::UInt8();
@@ -72,9 +59,6 @@ AUVMonitor::AUVMonitor(const rclcpp::NodeOptions & options) : Node("auv_monitor"
     //Initialize message data
     daq_current_msg.data = daq_current_status;
     daq_launcher_msg.data = daq_launcher_status;
-
-    exporter_current_msg.data = exporter_current_status;
-    exporter_launcher_msg.data = exporter_launcher_status;
 
     system_launcher_msg.data = system_launcher_status;
     system_current_msg.data = system_current_status;
@@ -157,43 +141,6 @@ void AUVMonitor::toggle_daq(const std::shared_ptr<std_srvs::srv::Trigger::Reques
     }
 }
 
-void AUVMonitor::launch_exporter(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response) {
-    //Start this before launching the system
-    if (!system_toggled) {
-        if (!exporter_active) {
-            RCLCPP_INFO(this->get_logger(), "Launching exporter.");
-
-            pid_t n = fork();
-
-            if (n == 0) {
-                int launch_result = execl("/bin/bash", "bash", "-c", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/${USERNAME}/ros_ws/install/setup.bash | ros2 launch adtr2_bringup exporter.launch.py", NULL);
-        
-                if (launch_result != -1) {
-                    RCLCPP_INFO(this->get_logger(), "Exporter launch script started successfully");
-                }
-
-                else {
-                    RCLCPP_ERROR(this->get_logger(), "Could not start launch script.");
-                    response->success = false;
-                    response->message = "Exporter not launched.";
-                    exporter_launcher_status = 1;
-                    exporter_active = false;
-                    exit(1);
-                }
-            }
-
-            else {
-                exporter_process = n;
-                response->success = true;
-                response->message = "Exporter launched.";
-                exporter_launcher_status = 255;
-                exporter_active = true;
-                return;
-            }
-        }
-    }
-}
-
 void AUVMonitor::toggle_system(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response) {
     if (!(system_current_status == 1)) {
         RCLCPP_INFO(this->get_logger(), "Starting system launch script...");
@@ -228,9 +175,9 @@ void AUVMonitor::toggle_system(const std::shared_ptr<std_srvs::srv::Trigger::Req
         }
     }
 
-    //If Visual SLAM is initialized
+    //If System is initialized
     else {
-        //Stop Visual SLAM
+        //Stop the system
         int stop_result = kill(system_process, SIGINT);
 
         if (stop_result != -1) {

@@ -13,6 +13,7 @@
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>std_srvs</depend>
+  <depend>vision_msgs</depend>
   <depend>rclcpp_components</depend>
   <depend>geometry_msgs</depend>
 

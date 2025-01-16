@@ -20,12 +20,12 @@
 #include "example_interfaces/msg/u_int8.hpp"
 #include "std_srvs/srv/trigger.hpp"
 
+//ADTR2 base class
+#include "adtr2_base/ADTR2Module.hpp"
+
 namespace adtr2 {
     namespace controller {
-        const std::string package_prefix = "/auv_controller/";
-        const int max_messages = 10;
-
-        class AUVController : public rclcpp::Node {
+        class AUVController : public adtr2::ADTR2Module {
         public:
             AUVController(const rclcpp::NodeOptions & options);
 

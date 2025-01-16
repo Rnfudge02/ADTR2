@@ -63,7 +63,7 @@ if [ ! -f "${ADTR2_DIR}/models/ONNX/yolov8n-${PLAT}.onnx" ] || [ ! -f "${ADTR2_D
 fi
 
 #Create the trt engine file
-if [ ! -f "${ADTR2_DIR}/models/TRT/yolo11n-${PLAT}.engine" ]; then
+if [ ! -f "${ADTR2_DIR}/models/TRT/yolo8n-${PLAT}.engine" ]; then
     echo -e "${FG_YELLOW}[Model Exporter]: Creating .engine file from ONNX file${RESET}"
     /usr/src/tensorrt/bin/trtexec $ARGS
 fi

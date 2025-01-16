@@ -6,17 +6,16 @@
 
 #include "adtr2_base/AUVController.hpp"
 
-using namespace std::chrono_literals;
 using namespace adtr2::controller;
 
-AUVController::AUVController(const rclcpp::NodeOptions & options) : Node("auv_controller", options), count_(0) {
-    status_timer = this->create_wall_timer(250ms, std::bind(&AUVController::status_timer_callback, this));
-    controller_timer = this->create_wall_timer(250ms, std::bind(&AUVController::controller_timer_callback, this));
+AUVController::AUVController(const rclcpp::NodeOptions & options) : ADTR2Module("auv_controller", options), count_(0) {
+    std::chrono::duration t_stat = this->reg_and_ret_ms("t_stat", 1000, "Period the node should use when communicating back to the AUVMonitor.");
+    std::chrono::duration t_cont = reg_and_ret_ms("t_cont", 250, "Period the node should use to check for detections.");
 
     internal_status = 0;
 
     internal_status_msg = example_interfaces::msg::UInt8();
-    internal_status_publisher = create_publisher<example_interfaces::msg::UInt8>(package_prefix + "status", max_messages);
+    internal_status_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "status", max_messages);
 
     internal_status_msg.data = internal_status;
 }

@@ -5,19 +5,23 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
+#Core Dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 
+#Standard communication interfaces
 find_package(std_msgs REQUIRED)
+find_package(vision_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(example_interfaces REQUIRED)
 
+#ZED2 Drivers
 find_package(zed_wrapper REQUIRED)
 find_package(zed_ros2 REQUIRED)
 find_package(zed_components REQUIRED)
 
+#Navigation messages
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(geographic_msgs REQUIRED)
@@ -44,7 +48,7 @@ target_compile_features(auv-director-component PUBLIC c_std_99 cxx_std_17)  # Re
 #Use ament to set target dependencies.
 ament_target_dependencies(auv-controller-component rclcpp rclcpp_components std_srvs tf2 tf2_geometry_msgs mavros_msgs example_interfaces)
 ament_target_dependencies(auv-monitor-component rclcpp rclcpp_components std_msgs std_srvs example_interfaces)
-ament_target_dependencies(auv-director-component rclcpp rclcpp_components std_msgs std_srvs example_interfaces)
+ament_target_dependencies(auv-director-component rclcpp rclcpp_components std_msgs std_srvs vision_msgs example_interfaces)
 
 #Register composable nodes
 rclcpp_components_register_node(
@@ -91,10 +95,6 @@ install(TARGETS auv-director-component
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
-
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
