@@ -37,11 +37,11 @@ namespace adtr2 {
             debug_desc.description = "The number of max messages the class will interact with. Default is 10. Larger values may cause instability.";
 
             //Declare paramater for debugging and retrieve as bool
-            this->declare_parameter("debug", false, debug_desc);
+            this->declare_parameter<bool>("debug", false, debug_desc);
             debug_flag = this->get_parameter("debug").as_bool();
 
             //Declare paramater for max message count
-            this->declare_parameter("max_messages", 10, max_messages_desc);
+            this->declare_parameter<int>("max_messages", 10, max_messages_desc);
             max_messages = this->get_parameter("max_messages").as_int();
 
             //If debugging is enabled alert the user
@@ -65,7 +65,7 @@ namespace adtr2 {
             desc.description = param_desc;
 
             //Declare paramater and retrieve value as int
-            this->declare_parameter(param_name, default_val, desc);
+            this->declare_parameter<int64_t>(param_name, static_cast<int64_t>(default_val), desc);
             int64_t param_int = this->get_parameter(param_name).as_int();
 
             //Convert to milliseconds and return to caller

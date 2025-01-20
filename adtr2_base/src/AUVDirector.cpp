@@ -29,13 +29,12 @@ AUVDirector::AUVDirector(const rclcpp::NodeOptions & options) : ADTR2Module("auv
     detection_timer = this->create_wall_timer(t_det, std::bind(&AUVDirector::detection_timer_callback, this));
     direction_timer = this->create_wall_timer(t_dir, std::bind(&AUVDirector::direction_timer_callback, this));
 
-    internal_status = 0;
-    quadrant_arr = 0b00;
+    uint64_t quadrant_msg = 0;
 
-    internal_status_msg = example_interfaces::msg::UInt8();
+    internal_status_msg = example_interfaces::msg::UInt64();
     internal_status_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "status", max_messages);
 
-    quadrant_arr_msg = example_interfaces::msg::UInt8();
+    quadrant_arr_msg = example_interfaces::msg::UInt64();
     quadrant_to_nav_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "quadrant_arr", max_messages);
 
     detection_subscriber = create_subscription<vision_msgs::msg::Detection2DArray>("/detections", 10, std::bind(&AUVDirector::detection_img_callback, this, std::placeholders::_1));

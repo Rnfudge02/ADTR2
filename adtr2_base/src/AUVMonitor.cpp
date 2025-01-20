@@ -14,7 +14,7 @@
 using namespace adtr2::monitor;
 
 AUVMonitor::AUVMonitor(const rclcpp::NodeOptions & options) : ADTR2Module("auv_monitor", options), count_(0) {
-    std::chrono::duration t_stat = this->reg_and_ret_ms("t_stat", "1000", "Period the AUVMonitor should monitor the system and publish it's status.");
+    std::chrono::duration t_stat = this->reg_and_ret_ms("t_stat", 1000, "Period the AUVMonitor should monitor the system and publish it's status.");
 
     //Set up timer for publishing statuses and timer for checking if nodes are active
     status_publishing_timer = this->create_wall_timer(t_stat, std::bind(&AUVMonitor::__status_publishing_callback, this));
@@ -36,18 +36,18 @@ AUVMonitor::AUVMonitor(const rclcpp::NodeOptions & options) : ADTR2Module("auv_m
     od_status = 0;
 
     //Create services for toggling components
-    daq_service = create_service<std_srvs::srv::Trigger>(module_prefix + "toggle_daq",
+    daq_service = create_service<std_srvs::srv::Trigger>(module_prefix + "/toggle_daq",
         std::bind(&AUVMonitor::toggle_daq, this, std::placeholders::_1, std::placeholders::_2));
 
-    system_service = create_service<std_srvs::srv::Trigger>(module_prefix + "toggle_system",
+    system_service = create_service<std_srvs::srv::Trigger>(module_prefix + "/toggle_system",
         std::bind(&AUVMonitor::toggle_system, this, std::placeholders::_1, std::placeholders::_2));
 
     //Create publishers for component statuses
-    daq_current_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "status/daq_current", max_messages);
-    daq_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "status/daq_launcher", max_messages);
+    daq_current_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "/status/daq_current", max_messages);
+    daq_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "/status/daq_launcher", max_messages);
 
-    system_current_publisher = create_publisher<example_interfaces::msg::UInt32>(module_prefix + "status/system_current", max_messages);
-    system_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "status/system_launcher", max_messages);
+    system_current_publisher = create_publisher<example_interfaces::msg::UInt32>(module_prefix + "/status/system_current", max_messages);
+    system_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "/status/system_launcher", max_messages);
     
     //Create uint8_t messages for publishing status
     daq_current_msg = example_interfaces::msg::UInt8();
@@ -152,7 +152,7 @@ void AUVMonitor::toggle_system(const std::shared_ptr<std_srvs::srv::Trigger::Req
             int launch_result = execl("/bin/bash", "bash", "-c", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/${USERNAME}/ros_ws/install/setup.bash | ros2 launch adtr2_bringup auv.system.launch.py", NULL);
 
             if (launch_result != -1) {
-                RCLCPP_INFO(this->get_logger(), "System launch script started successfully");
+                RCLCPP_INFO(this->get_logger(), "System launch script started successfully.");
             }
 
             else {

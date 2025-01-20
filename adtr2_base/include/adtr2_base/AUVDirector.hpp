@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <cstdlib>
 #include <unistd.h>
@@ -24,6 +25,7 @@
 
 #include "vision_msgs/msg/detection2_d_array.hpp"
 #include "vision_msgs/msg/detection2_d.hpp"
+#include "vision_msgs/msg/bounding_box2_d.hpp"
 
 namespace adtr2 {
     namespace director {
@@ -43,6 +45,7 @@ namespace adtr2 {
 
                 return;
             }
+
             void direction_timer_callback() {
         
                 return;
@@ -53,8 +56,23 @@ namespace adtr2 {
                 internal_status_publisher->publish(internal_status_msg);
             }
 
+            //Get image, add detections to det_array vector
             void detection_img_callback(const vision_msgs::msg::Detection2DArray::SharedPtr msg) {
                 RCLCPP_INFO(this->get_logger(), "Received a Detection2DArray message with %zu detections", msg->detections.size());
+
+                //Get all detections
+                std::vector<vision_msgs::msg::Detection2D::SharedPtr> det_array;
+
+                for (int i = 0; i < msg->detections.size(); i++) {
+                    det_array.push_back(msg->detections[i]);
+                }
+
+                
+                
+            }
+
+            void vslam_img_callback() {
+
             }
 
             uint8_t internal_status;
