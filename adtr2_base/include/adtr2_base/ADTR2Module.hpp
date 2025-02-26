@@ -3,17 +3,17 @@
 //SPDX-License-Identifier: Apache-2.0
 #pragma once
 
-//
+//ROS2 includes
 #include "rclcpp/rclcpp.hpp"
 
-//
+//Standard library includes
 #include <chrono>
 #include <string>
 
 namespace adtr2 {
     //! ADTR2Module - Contains common code and utilities for ADTR2 modules.
     /*!
-        Not mean't to be instantiated by the user, hence the protected constructor.
+        Not meant to be instantiated by the user, hence the protected constructor.
         Responsible for setting up debugging, max messages, and provides common utilities.
     !*/
     class ADTR2Module : public rclcpp::Node {
@@ -23,12 +23,16 @@ namespace adtr2 {
         }
 
     protected:
-        //! ADTR2Module - constructor for the base class of all ADTR2 modules.
+        //! Constructor for the base class of all ADTR2 modules.
         /*!
             Will run prior to the derived classes constructor, if there's a parameter common to all
             modules, it likely belongs here.
+
+            Creates a parameter, does the proper int64 casting, and then converts it to a milliseocnd representation for timing use.
+            @param name The modules per-instance name, accepts std::string.
+            @param options The options class used to retrieve launch parameters.
         !*/
-        ADTR2Module(std::string name, const rclcpp::NodeOptions & options) : Node(name, options) {
+        ADTR2Module(std::string name, const rclcpp::NodeOptions& options) : Node(name, options) {
             //Format descriptions for common arguments
             auto debug_desc = rcl_interfaces::msg::ParameterDescriptor{};
             debug_desc.description = "Debug flag, accepts 1 to enable debugging or 0 to disable.";
@@ -52,12 +56,13 @@ namespace adtr2 {
             module_prefix = name;
         }
 
-        //! Creates an AUVMonitor Node.
+        //! Helper function for registering and retrieving std::chrono representation of parameter in milliseconds.
         /*!
-            Initializes class members to a known state and sets up required ROS2 services and publisher topics.
-            @param stat_update_int Interval at which to publish topic updates. TEMP DISABLED
-            @param node_check_int Interval at which to check node topics. TEMP DISABLED
-            @return Instance of AUVMonitor.
+            Creates a parameter, does the proper int64 casting, and then converts it to a milliseocnd representation for timing use.
+            @param param_name The name of the parameter, accepts std::string.
+            @param default_val The default value for the parameter in milliseconds. Accepts uint64_t, default value is 100ms.
+            @param param_desc The description to be displayed for the parameter.
+            @return Millisecond representation of registered callback.
         !*/
         std::chrono::milliseconds reg_and_ret_ms(std::string param_name, uint64_t default_val = 100, std::string param_desc = "Description not available.") {
             //Format description

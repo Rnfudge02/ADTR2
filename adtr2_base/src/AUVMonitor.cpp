@@ -85,6 +85,7 @@ void AUVMonitor::toggle_daq(const std::shared_ptr<std_srvs::srv::Trigger::Reques
         if (!daq_toggled) {
             pid_t n = fork();
 
+            //Child process, transforms
             if (n == 0) {
                 //Use execl to run ros2 launch on data acquisition launch script - in child process
                 //NULL acts as sentinel
@@ -104,7 +105,7 @@ void AUVMonitor::toggle_daq(const std::shared_ptr<std_srvs::srv::Trigger::Reques
                 }
             }
 
-            //Store pid, format response, update internal member and return
+            //Store child pid, format response, update internal member and return
             else {
                 daq_process = n;
                 response->success = true;
@@ -117,23 +118,37 @@ void AUVMonitor::toggle_daq(const std::shared_ptr<std_srvs::srv::Trigger::Reques
 
         //Turn recording off and notify the user
         else {
-            int stop_result = kill(daq_process, SIGINT);
+            //Signal to child process to exit
+            int stop_result = kill(daq_process, SIGTERM);
 
             if (stop_result != -1) {
-                waitpid(daq_process, nullptr, 0);
-                RCLCPP_INFO(this->get_logger(), "Data acquisition stopped successfully!");
-                response->success = true;
-                response->message = "Data acquisition stopped.";
-                daq_launcher_status = 0;
-                daq_toggled = false;
-                return;
+                int status = 0;
+                waitpid(daq_process, &status, 0);
+
+                if (status != -1) {
+                    RCLCPP_INFO(this->get_logger(), "Data acquisition stopped successfully!");
+                    response->success = true;
+                    response->message = "Data acquisition stopped.";
+                    daq_launcher_status = 0;
+                    daq_toggled = false;
+                    return;
+                }
+
+                else {
+                    RCLCPP_WARN(this->get_logger(), "Error: Data acquisition process couldn't be terminated, is it running?");
+                    response->success = false;
+                    response->message = "Data acquisition not stopped.";
+                    daq_launcher_status = 2;
+                    daq_toggled = true;
+                    exit(1);
+                }
             }
 
             else {
-                RCLCPP_WARN(this->get_logger(), "Error: Data acquisition process couldn't be killed, is it running?");
+                RCLCPP_WARN(this->get_logger(), "Error: Data acquisition process couldn't be signalled, is it running?");
                 response->success = false;
                 response->message = "Data acquisition not stopped.";
-                daq_launcher_status = 2;
+                daq_launcher_status = 3;
                 daq_toggled = true;
                 exit(1);
             }
@@ -145,6 +160,7 @@ void AUVMonitor::toggle_system(const std::shared_ptr<std_srvs::srv::Trigger::Req
     if (!(system_current_status == 1)) {
         RCLCPP_INFO(this->get_logger(), "Starting system launch script...");
 
+        //Use fork and execl syscalls to create a new process and run script
         pid_t n = fork();
 
         if (n == 0) {
@@ -181,22 +197,71 @@ void AUVMonitor::toggle_system(const std::shared_ptr<std_srvs::srv::Trigger::Req
         int stop_result = kill(system_process, SIGINT);
 
         if (stop_result != -1) {
-            waitpid(system_process, nullptr, 0);
-            RCLCPP_INFO(this->get_logger(), "System stopped successfully!");
-            response->success = true;
-            response->message = "System stopped successfully.";
-            system_launcher_status = 0;
-            system_toggled = false;
-            return;
+            int status = 0;
+            waitpid(system_process, &status, 0);
+
+            if (status != -1) {
+                RCLCPP_INFO(this->get_logger(), "System stopped successfully!");
+                response->success = true;
+                response->message = "System stopped successfully.";
+                system_launcher_status = 0;
+                system_toggled = false;
+                return;
+            }
+
+            else {
+                RCLCPP_WARN(this->get_logger(), "Error: System process couldn't be terminated, is it running?");
+                response->success = false;
+                response->message = "System not stopped, failed to terminate process.";
+                system_launcher_status = 2;
+                system_toggled = true;
+                exit(1);
+            }
+            
         }
 
         else {
-            RCLCPP_WARN(this->get_logger(), "Error: System process couldn't be killed, is it running?");
+            RCLCPP_WARN(this->get_logger(), "Error: System process couldn't be signal, is it running?");
             response->success = false;
-            response->message = "System not stopped, failed to kill process.";
-            system_launcher_status = 2;
+            response->message = "System not stopped, failed to signal process.";
+            system_launcher_status = 3;
             system_toggled = true;
             exit(1);
         }
+    }
+}
+
+void AUVMonitor::__status_publishing_callback() {
+    //Update data of messages
+    daq_current_msg.data = daq_current_status;
+    daq_launcher_msg.data = daq_launcher_status;
+                
+    system_current_msg.data = system_current_status;
+    system_launcher_msg.data = system_launcher_status;
+
+    //Publish launching status
+    daq_launcher_publisher->publish(daq_launcher_msg);
+    system_launcher_publisher->publish(system_launcher_msg);
+
+    //Publish updated states
+    daq_current_publisher->publish(daq_current_msg);
+    system_current_publisher->publish(system_current_msg);
+}
+
+void AUVMonitor::__node_checking_callback() {
+    if (system_toggled) {
+        //Check ZED2i status
+
+        //Check VSLAM status
+
+        //Check OD status
+
+        //Check Data acquisition PID
+        if (daq_toggled) {
+                        
+        }
+
+        //Retrieve component statuses and bitmask into uint32
+        system_current_status = 0b0 | (zed_status << 8) | (vslam_status << 16) | (od_status << 24);
     }
 }

@@ -15,36 +15,40 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-//RCLCPP includes
+//ROS2 includes
 #include "rclcpp/rclcpp.hpp"
 #include "example_interfaces/msg/u_int8.hpp"
 #include "example_interfaces/msg/u_int32.hpp"
 #include "std_srvs/srv/trigger.hpp"
 
+//ADTR2 includes
 #include "adtr2_base/ADTR2Module.hpp"
 
 namespace adtr2 {
     namespace monitor {
-        //! AUVMonitor - Controls launching other components, and monitoring their status
+        //! AUVMonitor - Controls launching other components, and monitoring their status.
         /*!
             Responsible for launching and monitoring ROS2 nodes. This is accomplished with ROS2 services,
             which allow the user/developer to toggle components, and publishers to alert users/other components
-            to the status of all components.
+            to the status of all components. The services, when triggered, use syscalls to launch and interact with
+            the launched scripts as child processes.
         !*/
         class AUVMonitor : public adtr2::ADTR2Module {
         public:
             //! Creates an AUVMonitor Node.
             /*!
                 Initializes class members to a known state and sets up required ROS2 services and publisher topics.
-                @param stat_update_int Interval at which to publish topic updates. TEMP DISABLED
-                @param node_check_int Interval at which to check node topics. TEMP DISABLED
+                Returns configured ROS2 class instance to caller.
+
+                @param options Options structure used to pass launch arguments to class.
                 @return Instance of AUVMonitor.
             !*/
             AUVMonitor(const rclcpp::NodeOptions& options);
 
             //! Runs on AUVMonitor node death.
             /*!
-                Cleans up after class, freeing memory and triggering the destruction of controlled instances.
+                Cleans up after class, freeing memory and triggering the destruction of controlled child processes.
+
                 @return None.
             !*/
             ~AUVMonitor();
@@ -76,9 +80,7 @@ namespace adtr2 {
 
             //! Enables toggling system components
             /*!
-                Starts system parameters by calling system.launch.py, which determines it's behavior
-
-                @pre None
+                Starts system ros2 packages by calling system.launch.py, which determines it's behavior based on the settings.yaml file in the metapackage.
 
                 Precondition -> Postcondition:
 
@@ -103,22 +105,7 @@ namespace adtr2 {
 
                 @return void
             */
-            void __status_publishing_callback() {
-                //Update data of messages
-                daq_current_msg.data = daq_current_status;
-                daq_launcher_msg.data = daq_launcher_status;
-                
-                system_current_msg.data = system_current_status;
-                system_launcher_msg.data = system_launcher_status;
-
-                //Publish launching status
-                daq_launcher_publisher->publish(daq_launcher_msg);
-                system_launcher_publisher->publish(system_launcher_msg);
-
-                //Publish updated states
-                daq_current_publisher->publish(daq_current_msg);
-                system_current_publisher->publish(system_current_msg);
-            }
+            void __status_publishing_callback();
 
             //! Internal function for publishing status of components.
             /*!
@@ -126,23 +113,7 @@ namespace adtr2 {
 
                 @return void.
             !*/
-            void __node_checking_callback() {
-                if (system_toggled) {
-                    //Check ZED2i status
-
-                    //Check VSLAM status
-
-                    //Check OD status
-
-                    //Check Data acquisition PID
-                    if (daq_toggled) {
-                        
-                    }
-
-                    //Retrieve component statuses and bitmask into uint32
-                    system_current_status = 0b0 | (zed_status << 8) | (vslam_status << 16) | (od_status << 24);
-                }
-            }
+            void __node_checking_callback();
 
             //Timer members
             rclcpp::TimerBase::SharedPtr status_publishing_timer;
@@ -172,6 +143,7 @@ namespace adtr2 {
             example_interfaces::msg::UInt32 system_current_msg;
             example_interfaces::msg::UInt8 system_launcher_msg;
 
+            //Publishers
             rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_current_publisher;
             rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_launcher_publisher;
             
@@ -192,5 +164,6 @@ namespace adtr2 {
     }
 }
 
+//Register as component class
 #include <rclcpp_components/register_node_macro.hpp>
 RCLCPP_COMPONENTS_REGISTER_NODE(adtr2::monitor::AUVMonitor);

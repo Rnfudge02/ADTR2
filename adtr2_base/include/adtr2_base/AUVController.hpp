@@ -25,18 +25,40 @@
 
 namespace adtr2 {
     namespace controller {
+        //! AUVController - Controls interactions with MAVROS for the AUV.
+        /*!
+            Responsible for recieving data from the AUVDirector, and sending appropriate waypoints to mavros.
+        !*/
         class AUVController : public adtr2::ADTR2Module {
         public:
-            AUVController(const rclcpp::NodeOptions & options);
+            //! Creates an AUVController Node.
+            /*!
+                Initializes class members to a known state and sets up required ROS2 services for interacting with AUVDirector
+                and MAVROS node.
+
+                @param options Options structure used to pass launch arguments to class.
+                @return Instance of AUVController.
+            !*/
+            AUVController(const rclcpp::NodeOptions& options);
 
         protected:
 
         private:
+            //! Callback for sending messages to MAVROS.
+            /*!
+
+                @return None.
+            !*/
             void controller_timer_callback() {
         
                 return;
             }
 
+            //! Callback for updating device heartbeat.
+            /*!
+
+                @return None.
+            !*/
             void status_timer_callback() {
         
                 internal_status_publisher->publish(internal_status_msg);
