@@ -18,7 +18,7 @@
 
 //ROS2 includes
 #include "rclcpp/rclcpp.hpp"
-#include "example_interfaces/msg/u_int8.hpp"
+#include "std_msgs/msg/u_int8.hpp"
 #include "std_srvs/srv/trigger.hpp"
 
 #include "adtr2_base/ADTR2Module.hpp"
@@ -92,9 +92,9 @@ namespace adtr2 {
                 RCLCPP_INFO(this->get_logger(), "Received a Detection2DArray message with %zu detections", msg->detections.size());
 
                 //Get all detections
-                vision_msgs::msg::Detection2DArray det_array = *msg;
+                //vision_msgs::msg::Detection2DArray det_array = *msg;
 
-                det_array.insert(det_array.detections.end(), new_detections.detections.begin(), new_detections.detections.end());
+                //det_array.insert(det_array.detections.end(), new_detections.detections.begin(), new_detections.detections.end());
 
  
             }
@@ -109,7 +109,7 @@ namespace adtr2 {
 
             //
             uint8_t internal_status;
-            example_interfaces::msg::UInt8 internal_status_msg;
+            std_msgs::msg::UInt8 internal_status_msg;
 
             //
             rclcpp::TimerBase::SharedPtr detection_timer;
@@ -117,15 +117,15 @@ namespace adtr2 {
             rclcpp::TimerBase::SharedPtr status_timer;
 
             //
-            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr internal_status_publisher;
+            rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr internal_status_publisher;
 
             uint8_t quadrant_arr;
 
             //
             rclcpp::Subscription<vision_msgs::msg::Detection2DArray>::SharedPtr detection_subscriber;
 
-            example_interfaces::msg::UInt8 quadrant_arr_msg;
-            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr quadrant_to_nav_publisher;
+            std_msgs::msg::UInt8 quadrant_arr_msg;
+            rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr quadrant_to_nav_publisher;
 
             //Assuming is used to allow only one instance of the class to exist
             size_t count_;

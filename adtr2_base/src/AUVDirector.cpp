@@ -31,11 +31,8 @@ AUVDirector::AUVDirector(const rclcpp::NodeOptions & options) : ADTR2Module("auv
 
     uint64_t quadrant_msg = 0;
 
-    internal_status_msg = example_interfaces::msg::UInt64();
-    internal_status_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "status", max_messages);
-
-    quadrant_arr_msg = example_interfaces::msg::UInt64();
-    quadrant_to_nav_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "quadrant_arr", max_messages);
+    internal_status_msg = std_msgs::msg::UInt8();
+    internal_status_publisher = create_publisher<std_msgs::msg::UInt8>(module_prefix + "status", max_messages);
 
     detection_subscriber = create_subscription<vision_msgs::msg::Detection2DArray>("/detections", 10, std::bind(&AUVDirector::detection_img_callback, this, std::placeholders::_1));
     internal_status_msg.data = internal_status;

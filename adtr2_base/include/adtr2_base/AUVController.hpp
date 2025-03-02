@@ -17,7 +17,7 @@
 
 //RCLCPP includes
 #include "rclcpp/rclcpp.hpp"
-#include "example_interfaces/msg/u_int8.hpp"
+#include "std_msgs/msg/u_int8.hpp"
 #include "std_srvs/srv/trigger.hpp"
 
 //ADTR2 base class
@@ -60,17 +60,17 @@ namespace adtr2 {
                 @return None.
             !*/
             void status_timer_callback() {
-        
+    
                 internal_status_publisher->publish(internal_status_msg);
             }
 
             uint8_t internal_status;
 
-            example_interfaces::msg::UInt8 internal_status_msg;
+            std_msgs::msg::UInt8 internal_status_msg;
 
             rclcpp::TimerBase::SharedPtr controller_timer;
             rclcpp::TimerBase::SharedPtr status_timer;
-            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr internal_status_publisher;
+            rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr internal_status_publisher;
 
             size_t count_;
         };

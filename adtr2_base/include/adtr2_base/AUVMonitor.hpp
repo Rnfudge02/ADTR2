@@ -17,8 +17,8 @@
 
 //ROS2 includes
 #include "rclcpp/rclcpp.hpp"
-#include "example_interfaces/msg/u_int8.hpp"
-#include "example_interfaces/msg/u_int32.hpp"
+#include "std_msgs/msg/u_int8.hpp"
+#include "std_msgs/msg/u_int32.hpp"
 #include "std_srvs/srv/trigger.hpp"
 
 //ADTR2 includes
@@ -137,18 +137,18 @@ namespace adtr2 {
             uint8_t od_status;
 
             //Messages for publishing statuses
-            example_interfaces::msg::UInt8 daq_current_msg;
-            example_interfaces::msg::UInt8 daq_launcher_msg;
+            std_msgs::msg::UInt8 daq_current_msg;
+            std_msgs::msg::UInt8 daq_launcher_msg;
 
-            example_interfaces::msg::UInt32 system_current_msg;
-            example_interfaces::msg::UInt8 system_launcher_msg;
+            std_msgs::msg::UInt32 system_current_msg;
+            std_msgs::msg::UInt8 system_launcher_msg;
 
             //Publishers
-            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_current_publisher;
-            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr daq_launcher_publisher;
+            rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr daq_current_publisher;
+            rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr daq_launcher_publisher;
             
-            rclcpp::Publisher<example_interfaces::msg::UInt32>::SharedPtr system_current_publisher;
-            rclcpp::Publisher<example_interfaces::msg::UInt8>::SharedPtr system_launcher_publisher;
+            rclcpp::Publisher<std_msgs::msg::UInt32>::SharedPtr system_current_publisher;
+            rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr system_launcher_publisher;
 
             //Launching Information
             pid_t daq_process;

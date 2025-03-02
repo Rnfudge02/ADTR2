@@ -14,7 +14,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(vision_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
-find_package(example_interfaces REQUIRED)
+find_package(std_msgs REQUIRED)
 
 #ZED2 Drivers
 find_package(zed_wrapper REQUIRED)
@@ -46,9 +46,9 @@ target_compile_features(auv-monitor-component PUBLIC c_std_99 cxx_std_17)  # Req
 target_compile_features(auv-director-component PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
 #Use ament to set target dependencies.
-ament_target_dependencies(auv-controller-component rclcpp rclcpp_components std_srvs tf2 tf2_geometry_msgs mavros_msgs example_interfaces)
-ament_target_dependencies(auv-monitor-component rclcpp rclcpp_components std_msgs std_srvs example_interfaces)
-ament_target_dependencies(auv-director-component rclcpp rclcpp_components std_msgs std_srvs vision_msgs example_interfaces)
+ament_target_dependencies(auv-controller-component rclcpp rclcpp_components std_srvs tf2 tf2_geometry_msgs mavros_msgs std_msgs)
+ament_target_dependencies(auv-monitor-component rclcpp rclcpp_components std_msgs std_srvs std_msgs)
+ament_target_dependencies(auv-director-component rclcpp rclcpp_components std_msgs std_srvs vision_msgs std_msgs)
 
 #Register composable nodes
 rclcpp_components_register_node(

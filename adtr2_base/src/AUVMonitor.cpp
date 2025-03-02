@@ -43,18 +43,18 @@ AUVMonitor::AUVMonitor(const rclcpp::NodeOptions & options) : ADTR2Module("auv_m
         std::bind(&AUVMonitor::toggle_system, this, std::placeholders::_1, std::placeholders::_2));
 
     //Create publishers for component statuses
-    daq_current_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "/status/daq_current", max_messages);
-    daq_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "/status/daq_launcher", max_messages);
+    daq_current_publisher = create_publisher<std_msgs::msg::UInt8>(module_prefix + "/status/daq_current", max_messages);
+    daq_launcher_publisher = create_publisher<std_msgs::msg::UInt8>(module_prefix + "/status/daq_launcher", max_messages);
 
-    system_current_publisher = create_publisher<example_interfaces::msg::UInt32>(module_prefix + "/status/system_current", max_messages);
-    system_launcher_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "/status/system_launcher", max_messages);
+    system_current_publisher = create_publisher<std_msgs::msg::UInt32>(module_prefix + "/status/system_current", max_messages);
+    system_launcher_publisher = create_publisher<std_msgs::msg::UInt8>(module_prefix + "/status/system_launcher", max_messages);
     
     //Create uint8_t messages for publishing status
-    daq_current_msg = example_interfaces::msg::UInt8();
-    daq_launcher_msg = example_interfaces::msg::UInt8();
+    daq_current_msg = std_msgs::msg::UInt8();
+    daq_launcher_msg = std_msgs::msg::UInt8();
 
-    system_current_msg = example_interfaces::msg::UInt32();
-    system_launcher_msg = example_interfaces::msg::UInt8();
+    system_current_msg = std_msgs::msg::UInt32();
+    system_launcher_msg = std_msgs::msg::UInt8();
 
     //Initialize message data
     daq_current_msg.data = daq_current_status;

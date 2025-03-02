@@ -14,8 +14,8 @@ AUVController::AUVController(const rclcpp::NodeOptions & options) : ADTR2Module(
 
     internal_status = 0;
 
-    internal_status_msg = example_interfaces::msg::UInt8();
-    internal_status_publisher = create_publisher<example_interfaces::msg::UInt8>(module_prefix + "status", max_messages);
+    internal_status_msg = std_msgs::msg::UInt8();
+    internal_status_publisher = create_publisher<std_msgs::msg::UInt8>(module_prefix + "status", max_messages);
 
     internal_status_msg.data = internal_status;
 }
