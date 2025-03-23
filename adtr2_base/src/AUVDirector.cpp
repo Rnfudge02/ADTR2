@@ -29,8 +29,6 @@ AUVDirector::AUVDirector(const rclcpp::NodeOptions & options) : ADTR2Module("auv
     detection_timer = this->create_wall_timer(t_det, std::bind(&AUVDirector::detection_timer_callback, this));
     direction_timer = this->create_wall_timer(t_dir, std::bind(&AUVDirector::direction_timer_callback, this));
 
-    uint64_t quadrant_msg = 0;
-
     internal_status_msg = std_msgs::msg::UInt8();
     internal_status_publisher = create_publisher<std_msgs::msg::UInt8>(module_prefix + "status", max_messages);
 
